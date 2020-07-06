@@ -9,24 +9,24 @@
 * 8 MiB external QuadSPI Flash
 * 8 MiB external QuadSPI SRAM (optional)
 * Super-VGA output
-   * 640x480
-   * 800x600
-   * 256 colours from a pallette of 262,144
+   * 640x480, 720x400 and 800x600 resolution
+   * Maybe 320x200 and 320x240 (if we can re-map the video buffer on each scan-line to do line doubling)
+   * Fixed RRGGGBB palette of 128 colours (sadly the Teensy 4.1 only breaks out 7 eLCDIF data pins)
 * 16-bit 48 kHz audio input and output (line-in, mic-in, line-out and headphone-out)
 * Four USB ports
    * Two USB A ports on-board
    * Header for additional two ports
 * IEEE-1284 Parallel Port
 * RS232 Port (five-wire)
-* 2x SD/MMC Slots
-* PS/2 Keyboard and Mouse ports
+* 2x SD Card Slots (one micro-SD internal, one full-size SD external)
+* 2x PS/2 ports (Keyboard and Mouse)
 * 2x Atari/Sega joystick ports
 * Battery-backed Real-time Clock and CMOS RAM
 * SPI and I2C based expansion bus (Neotron-32 Compatible)
 
 ## Why Neotron-600?
 
-Because it's clocked at 600 MHz.
+Because it's clocked at 600 MHz, and it's a bit better than a Neotron 500 I was working on.
 
 ## The detailed specs
 
@@ -89,7 +89,9 @@ The Teensy 4.1 takes the CPU and adds:
 * A micro SD slot
 * Lots of easy to solder plated-through holes with a 2.54mm pitch
 
-Our Motherboard matches the Teensy 4.1 pinout, allowing you to solder some headers (sockets one side, pins the other) and drop the Teensy right on.
+Unfortunately they didn't plan to use the eLCDIF on the Teensy 4.1, and so only 7 random RGB video pins are broken out. We use the built-in palette system to map a 8-bit value in RAM to a 16-bit value to be written to the display, of which 9 pins go no-where and are ignored. Fortunately, HSYNC and VSYNC are broken out.
+
+The Neotron 600 motherboard matches the Teensy 4.1 pinout, allowing you to solder some headers (sockets one side, pins the other) and drop the Teensy right on, including the USB and Ethernet headers. If you were happy to live without the Parallel port, or the PS/2 and Joystick ports, you could load a Neotron BIOS on to your Teensy 4.1 and dispense with the motherboard entirely - using just the standard Ethernet and USB break-out cables.
 
 ### Memory Layout
 
@@ -97,12 +99,15 @@ We expect to use:
 
 * Around 128 KiB of tightly-coupled SRAM for the system stack, OS buffers, and performance-critical routines.
 * The remaining 896 KiB SRAM is split between video frame buffers and user applications
-  * 640x480 @ 8bpp = 300 KiB, leaving 596 KiB for applications
-  * 800x600 @ 8bpp = 468 KiB, leaving 428 KiB for applications
+  * 720x400 @ 8bpp = 282 KiB, leaving 614 KiB free
+  * 640x480 @ 8bpp = 300 KiB, leaving 596 KiB free
+  * 800x600 @ 8bpp = 468 KiB, leaving 428 KiB free
 * 4 KiB NVRAM for system settings
 * 512 KiB Flash for the Neotron BIOS
 * 512 KiB Flash for Neotron OS
 * Remaining 7 MiB of Flash for ROM-based user applications
+
+If we can trick the video hardware into running at 320x480, and then remap the video frame buffer after every scan-line so we only need 240 lines of video memory, we only need 75 KiB of video RAM. This would also line up nicely with the classic MS-DOS PC game video resolution. We might even get away with rendering text modes one text row at a time on the scan-line interrupt, meaning we could get colour 80x50 text in 8000 bytes, and 40x25 text in 2000 bytes.
 
 ## The Motherboard
 
