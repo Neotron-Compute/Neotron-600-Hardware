@@ -35,7 +35,7 @@ Because it's clocked at 600 MHz.
 The Neotron-600 uses a [Teensy 4.1] board, which features an NXP [iMXRT1062] microcontroller.
 
 [Teensy 4.1]: https://www.pjrc.com/store/teensy41.html
-[iMXRT1062]: https://www.st.com/en/microcontrollers-microprocessors/stm32h753ii.html
+[iMXRT1062]: ./Datasheets/IMXRT1060%20Data%20Sheet.pdf
 
 The microcontroller on the Teensy 4.1 has:
 
